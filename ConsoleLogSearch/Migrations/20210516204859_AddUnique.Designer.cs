@@ -3,14 +3,16 @@ using ConsoleLogSearch;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ConsoleLogSearch.Migrations
 {
     [DbContext(typeof(HelixContext))]
-    partial class HelixContextModelSnapshot : ModelSnapshot
+    [Migration("20210516204859_AddUnique")]
+    partial class AddUnique
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

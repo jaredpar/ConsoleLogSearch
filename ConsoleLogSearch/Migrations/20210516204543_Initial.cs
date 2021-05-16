@@ -2,7 +2,7 @@
 
 namespace ConsoleLogSearch.Migrations
 {
-    public partial class InitialMigration : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -12,7 +12,7 @@ namespace ConsoleLogSearch.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ConsoleLog = table.Column<string>(type: "text", nullable: false),
+                    ConsoleLog = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ConsoleLogUri = table.Column<string>(type: "varchar(1000)", nullable: false)
                 },
                 constraints: table =>

@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ConsoleLogSearch.Migrations
 {
     [DbContext(typeof(HelixContext))]
-    [Migration("20210516174106_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20210516204601_FullTextSearch")]
+    partial class FullTextSearch
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -29,7 +29,7 @@ namespace ConsoleLogSearch.Migrations
 
                     b.Property<string>("ConsoleLog")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConsoleLogUri")
                         .IsRequired()

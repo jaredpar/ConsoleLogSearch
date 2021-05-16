@@ -22,6 +22,10 @@ namespace ConsoleLogSearch
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<HelixConsoleLog>()
+                .HasIndex(x => x.ConsoleLogUri)
+                .IsUnique();
         }
     }
 
@@ -29,7 +33,7 @@ namespace ConsoleLogSearch
     {
         public int Id { get; set; }
 
-        [Column(TypeName = "text")]
+        [Column(TypeName = "nvarchar(max)")]
         [Required]
         public string ConsoleLog { get; set; }
 
