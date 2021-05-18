@@ -9,15 +9,14 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-
 namespace ConsoleLogSearch
 {
     public class Program
     {
         public static async Task Main(string[] args)
         {
-            await Populate();
-            // await SearchAsync();
+            // await Populate();
+            await SearchAsync();
         }
 
         public static async Task SearchAsync()
@@ -81,7 +80,7 @@ namespace ConsoleLogSearch
             var importCount = 0;
             var skipCount = 0;
             var allUris = await File.ReadAllLinesAsync(@"c:\users\jaredpar\code\ConsoleLogSearch\ConsoleLogSearch\console.txt");
-            DrawStats();
+            DrawStats(null);
             foreach (var uri in allUris)
             {
                 try
@@ -91,8 +90,7 @@ namespace ConsoleLogSearch
                         continue;
                     }
 
-                    DrawStats();
-                    DrawUri(uri);
+                    DrawStats(uri);
                     var message = new HttpRequestMessage(HttpMethod.Get, uri);
                     var response = await httpClient.SendAsync(message);
                     var content = await response.Content.ReadAsStringAsync();
@@ -123,21 +121,32 @@ namespace ConsoleLogSearch
                 }
             }
 
-            void DrawStats()
+            void DrawClear()
             {
+                Console.SetCursorPosition(0, top: 0);
+                var buffer = new string(' ', Console.WindowWidth);
+                for (int i = 0; i < 6; i++)
+                {
+                    Console.WriteLine(buffer);
+                }
+            }
+
+            void DrawStats(string uri)
+            {
+                DrawClear();
                 Console.SetCursorPosition(0, top: 0);
                 Console.WriteLine($"Total {totalCount:N0}");
                 Console.WriteLine($"Imported {importCount:N0}");
                 Console.WriteLine($"Skipped {skipCount:N0}");
                 Console.WriteLine($"Remaining {(allUris.Length - (totalCount + importCount + skipCount)):N0}");
-            }
-
-            void DrawUri(string uri)
-            {
                 Console.SetCursorPosition(0, top: 4);
                 Console.WriteLine("");
-                Console.SetCursorPosition(0, top: 4);
-                Console.WriteLine(uri);
+
+                if (uri is {})
+                {
+                    Console.SetCursorPosition(0, top: 4);
+                    Console.WriteLine(uri);
+                }
             }
         }
 
