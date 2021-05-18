@@ -16,13 +16,16 @@ namespace ConsoleLogSearch
     {
         public static async Task Main(string[] args)
         {
-            // await Populate();
-            await SearchAsync();
+            await Populate();
+            // await SearchAsync();
         }
 
         public static async Task SearchAsync()
         {
             var helixContext = GetHelixContext();
+            var fullCount = await helixContext.HelixConsoleLogs.CountAsync();
+            Console.WriteLine($"Total log count {fullCount}");
+
             while (true)
             {
                 Console.WriteLine("Enter a search term");
@@ -74,27 +77,31 @@ namespace ConsoleLogSearch
                 set.Add(uri);
             }
 
-            foreach (var line in await File.ReadAllLinesAsync(@"c:\users\jaredpar\code\ConsoleLogSearch\ConsoleLogSearch\console.csv"))
+            var totalCount = await helixContext.HelixConsoleLogs.CountAsync();
+            var importCount = 0;
+            var skipCount = 0;
+            var allUris = await File.ReadAllLinesAsync(@"c:\users\jaredpar\code\ConsoleLogSearch\ConsoleLogSearch\console.txt");
+            DrawStats();
+            foreach (var uri in allUris)
             {
                 try
                 {
-                    var parts = line.Split(new[] { ',' }, count: 2);
-                    var size = int.Parse(parts[0]);
-                    if (size >= 500_000)
-                    {
-                        continue;
-                    }
-
-                    var uri = parts[1];
                     if (!set.Add(uri))
                     {
                         continue;
                     }
 
-                    Console.WriteLine(uri);
+                    DrawStats();
+                    DrawUri(uri);
                     var message = new HttpRequestMessage(HttpMethod.Get, uri);
                     var response = await httpClient.SendAsync(message);
                     var content = await response.Content.ReadAsStringAsync();
+                    if (content.Length > 1_000_000)
+                    {
+                        skipCount++;
+                        continue;
+                    }
+
                     var log = new HelixConsoleLog()
                     {
                         ConsoleLog = content,
@@ -102,6 +109,8 @@ namespace ConsoleLogSearch
                     };
                     helixContext.Add(log);
                     await helixContext.SaveChangesAsync();
+                    importCount++;
+                    totalCount++;
                 }
                 catch (Exception ex)
                 {
@@ -112,6 +121,23 @@ namespace ConsoleLogSearch
                         ex = ie;
                     }
                 }
+            }
+
+            void DrawStats()
+            {
+                Console.SetCursorPosition(0, top: 0);
+                Console.WriteLine($"Total {totalCount:N0}");
+                Console.WriteLine($"Imported {importCount:N0}");
+                Console.WriteLine($"Skipped {skipCount:N0}");
+                Console.WriteLine($"Remaining {(allUris.Length - (totalCount + importCount + skipCount)):N0}");
+            }
+
+            void DrawUri(string uri)
+            {
+                Console.SetCursorPosition(0, top: 4);
+                Console.WriteLine("");
+                Console.SetCursorPosition(0, top: 4);
+                Console.WriteLine(uri);
             }
         }
 
